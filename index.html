@@ -1,0 +1,1086 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>RentEase — Car Rental Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0B0D11;--surface:#141720;--surface2:#1C2030;--border:#2A2F45;
+  --accent:#E8FF5A;--accent2:#5A9EFF;--text:#F0F2FF;--muted:#8892B0;
+  --success:#3BF5A0;--warning:#FFB347;--danger:#FF6B6B;
+  --radius:12px;--radius-lg:18px;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;font-size:15px}
+h1,h2,h3,h4{font-family:'Syne',sans-serif}
+
+/* NAV */
+nav{display:flex;align-items:center;justify-content:space-between;padding:1rem 2rem;border-bottom:1px solid var(--border);position:sticky;top:0;background:rgba(11,13,17,0.95);backdrop-filter:blur(12px);z-index:100}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.4rem;color:var(--accent);letter-spacing:-0.5px;cursor:pointer}
+.logo span{color:var(--text)}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:14px;font-weight:500;transition:color 0.2s;cursor:pointer}
+.nav-links a:hover,.nav-links a.active{color:var(--text)}
+.nav-right{display:flex;align-items:center;gap:12px}
+.btn{padding:8px 18px;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;transition:all 0.2s}
+.btn:disabled{opacity:0.5;cursor:not-allowed}
+.btn-ghost{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-ghost:hover:not(:disabled){color:var(--text);border-color:var(--muted)}
+.btn-primary{background:var(--accent);color:#0B0D11;font-weight:600}
+.btn-primary:hover:not(:disabled){opacity:0.9;transform:translateY(-1px)}
+.btn-sm{padding:6px 14px;font-size:13px}
+.btn-danger{background:rgba(255,107,107,0.15);color:var(--danger);border:1px solid rgba(255,107,107,0.3)}
+.btn-success{background:rgba(59,245,160,0.15);color:var(--success);border:1px solid rgba(59,245,160,0.3)}
+
+/* VIEWS */
+.view{display:none;animation:fadeIn 0.3s ease}
+.view.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* HERO */
+.hero{padding:5rem 2rem 4rem;max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(232,255,90,0.08);border:1px solid rgba(232,255,90,0.2);color:var(--accent);padding:6px 14px;border-radius:99px;font-size:13px;font-weight:500;margin-bottom:1.5rem}
+.hero h1{font-size:3.2rem;font-weight:800;line-height:1.1;letter-spacing:-1.5px;margin-bottom:1.2rem}
+.hero h1 span{color:var(--accent)}
+.hero p{color:var(--muted);line-height:1.7;margin-bottom:2rem;font-size:1rem}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap}
+.btn-lg{padding:12px 28px;font-size:15px;border-radius:10px}
+.hero-visual{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem;position:relative;overflow:hidden}
+.hero-visual::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;background:radial-gradient(circle,rgba(232,255,90,0.08) 0%,transparent 70%);pointer-events:none}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:1rem}
+.stat-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1rem}
+.stat-card .label{font-size:12px;color:var(--muted);margin-bottom:4px}
+.stat-card .value{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:700;color:var(--accent)}
+.stat-card .sub{font-size:12px;color:var(--success)}
+.mini-booking{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1rem}
+.mini-booking .mb-label{font-size:12px;color:var(--muted);margin-bottom:8px;font-weight:500;text-transform:uppercase;letter-spacing:0.5px}
+.mini-row{display:flex;gap:8px;align-items:center;margin-bottom:8px}
+.mini-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none}
+.mini-input:focus{border-color:var(--accent2)}
+
+/* TAGS */
+.tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:500}
+.tag-green{background:rgba(59,245,160,0.1);color:var(--success);border:1px solid rgba(59,245,160,0.2)}
+.tag-yellow{background:rgba(232,255,90,0.1);color:var(--accent);border:1px solid rgba(232,255,90,0.2)}
+.tag-red{background:rgba(255,107,107,0.1);color:var(--danger);border:1px solid rgba(255,107,107,0.2)}
+.tag-blue{background:rgba(90,158,255,0.1);color:var(--accent2);border:1px solid rgba(90,158,255,0.2)}
+
+/* SECTION */
+.section{padding:3.5rem 2rem;max-width:1100px;margin:0 auto}
+.section-header{margin-bottom:2rem}
+.section-header h2{font-size:2rem;font-weight:700;letter-spacing:-0.5px;margin-bottom:0.4rem}
+.section-header p{color:var(--muted);font-size:0.95rem}
+
+/* FEATURES */
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.feat-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem;transition:border-color 0.2s}
+.feat-card:hover{border-color:var(--accent2)}
+.feat-icon{width:42px;height:42px;border-radius:10px;background:rgba(90,158,255,0.1);border:1px solid rgba(90,158,255,0.2);display:flex;align-items:center;justify-content:center;margin-bottom:1rem;font-size:1.2rem}
+.feat-icon.yellow{background:rgba(232,255,90,0.1);border-color:rgba(232,255,90,0.2)}
+.feat-icon.green{background:rgba(59,245,160,0.1);border-color:rgba(59,245,160,0.2)}
+.feat-card h3{font-size:1rem;font-weight:600;margin-bottom:0.4rem}
+.feat-card p{font-size:13px;color:var(--muted);line-height:1.6}
+
+/* VEHICLES */
+.filters{display:flex;gap:8px;margin-bottom:1.5rem;flex-wrap:wrap}
+.filter-btn{padding:7px 16px;border-radius:99px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'DM Sans',sans-serif;font-size:13px;cursor:pointer;transition:all 0.2s}
+.filter-btn.active,.filter-btn:hover{background:var(--surface2);color:var(--text);border-color:var(--muted)}
+.cars-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.car-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;transition:transform 0.2s,border-color 0.2s}
+.car-card:hover{transform:translateY(-3px);border-color:var(--accent2)}
+.car-img{height:140px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:3.5rem;border-bottom:1px solid var(--border);position:relative}
+.car-avail{position:absolute;top:10px;right:10px}
+.car-body{padding:1rem}
+.car-name{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:4px}
+.car-vendor{font-size:12px;color:var(--muted);margin-bottom:10px}
+.car-specs{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.car-spec{font-size:12px;color:var(--muted)}
+.car-spec span{color:var(--text);font-weight:500}
+.car-footer{display:flex;align-items:center;justify-content:space-between}
+.car-price{font-family:'Syne',sans-serif;font-weight:700;font-size:1.2rem;color:var(--accent)}
+.car-price sub{font-size:12px;color:var(--muted);font-weight:400;font-family:'DM Sans',sans-serif}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:flex;align-items:center;justify-content:center;z-index:200;backdrop-filter:blur(4px)}
+.modal-overlay.hidden{display:none}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:2rem;width:100%;max-width:480px;max-height:90vh;overflow-y:auto}
+.modal h2{font-size:1.3rem;font-weight:700;margin-bottom:1.5rem}
+.form-group{margin-bottom:1.2rem}
+.form-group label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:500}
+.form-input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:10px 14px;color:var(--text);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color 0.2s}
+.form-input:focus{border-color:var(--accent2)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.price-summary{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:1.2rem}
+.price-row{display:flex;justify-content:space-between;font-size:14px;padding:4px 0}
+.price-row.total{border-top:1px solid var(--border);margin-top:8px;padding-top:12px;font-weight:600;color:var(--accent);font-family:'Syne',sans-serif}
+.modal-footer{display:flex;gap:10px}
+.modal-footer .btn{flex:1;text-align:center}
+
+/* AUTH MODAL */
+.auth-tabs{display:flex;gap:0;margin-bottom:1.5rem;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.auth-tab{flex:1;padding:10px;text-align:center;cursor:pointer;font-size:14px;font-weight:500;color:var(--muted);background:transparent;border:none;font-family:'DM Sans',sans-serif;transition:all 0.2s}
+.auth-tab.active{background:var(--accent);color:#0B0D11;font-weight:600}
+.auth-error{color:var(--danger);font-size:13px;margin-bottom:1rem;display:none}
+.auth-error.show{display:block}
+.role-select{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:1.2rem}
+.role-opt{padding:10px 8px;border-radius:8px;border:1px solid var(--border);text-align:center;cursor:pointer;font-size:13px;color:var(--muted);transition:all 0.2s}
+.role-opt.selected{border-color:var(--accent2);color:var(--text);background:rgba(90,158,255,0.1)}
+.role-opt .role-emoji{font-size:1.4rem;display:block;margin-bottom:4px}
+
+/* DASHBOARD */
+.dash-grid{display:grid;grid-template-columns:240px 1fr;gap:0;min-height:600px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden}
+.dash-sidebar{background:var(--surface);border-right:1px solid var(--border);padding:1.5rem 1rem}
+.dash-sidebar h3{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:1rem;padding:0 0.5rem}
+.side-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:8px;cursor:pointer;font-size:14px;color:var(--muted);transition:all 0.2s;margin-bottom:2px}
+.side-item:hover,.side-item.active{background:var(--surface2);color:var(--text)}
+.side-item.active{color:var(--accent)}
+.dash-main{padding:1.5rem;overflow-y:auto}
+.dash-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
+.ds-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1rem}
+.ds-card .ds-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px}
+.ds-card .ds-val{font-family:'Syne',sans-serif;font-size:1.5rem;font-weight:700}
+.ds-card .ds-change{font-size:11px;margin-top:2px}
+.ds-card .ds-change.up{color:var(--success)}
+.ds-card .ds-change.down{color:var(--danger)}
+
+/* TABLES */
+.bookings-table{width:100%;border-collapse:collapse}
+.bookings-table th{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;padding:8px 12px;text-align:left;border-bottom:1px solid var(--border)}
+.bookings-table td{padding:10px 12px;font-size:13px;border-bottom:1px solid rgba(42,47,69,0.5)}
+.bookings-table tr:last-child td{border-bottom:none}
+.bookings-table tr:hover td{background:var(--surface2)}
+.status-badge{padding:3px 10px;border-radius:99px;font-size:11px;font-weight:600;white-space:nowrap}
+.sb-active{background:rgba(59,245,160,0.1);color:var(--success)}
+.sb-pending{background:rgba(255,179,71,0.1);color:var(--warning)}
+.sb-done,.sb-completed{background:rgba(138,153,194,0.1);color:var(--muted)}
+.sb-cancelled{background:rgba(255,107,107,0.1);color:var(--danger)}
+
+/* ADMIN */
+.admin-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:1.5rem}
+.admin-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.2rem}
+.admin-card h3{font-size:14px;font-weight:600;margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between}
+.activity-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid rgba(42,47,69,0.5);font-size:13px}
+.activity-item:last-child{border-bottom:none}
+.activity-dot{width:8px;height:8px;border-radius:50%;background:var(--accent2);margin-top:4px;flex-shrink:0}
+.activity-dot.green{background:var(--success)}
+.activity-dot.yellow{background:var(--warning)}
+.activity-meta{color:var(--muted);font-size:11px;margin-top:2px}
+
+/* CHART */
+.chart-bars{display:flex;align-items:flex-end;gap:8px;height:100px;padding-bottom:4px;margin-top:1rem}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar{width:100%;border-radius:4px 4px 0 0;background:var(--accent2);transition:opacity 0.2s;min-height:4px}
+.bar:hover{opacity:0.8}
+.bar-label{font-size:10px;color:var(--muted);text-align:center}
+
+/* PROGRESS */
+.prog-bar{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin:4px 0}
+.prog-fill{height:100%;border-radius:2px;background:var(--accent2)}
+
+/* TOAST */
+.toast{position:fixed;bottom:2rem;right:2rem;background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:1rem 1.4rem;z-index:999;max-width:320px;display:flex;align-items:flex-start;gap:10px;animation:slideIn 0.3s ease;box-shadow:0 8px 32px rgba(0,0,0,0.4)}
+.toast.hidden{display:none}
+.toast-icon{font-size:1.2rem;flex-shrink:0}
+.toast-text h4{font-size:14px;font-weight:600;margin-bottom:2px}
+.toast-text p{font-size:12px;color:var(--muted)}
+@keyframes slideIn{from{transform:translateX(20px);opacity:0}to{transform:translateX(0);opacity:1}}
+
+/* USER BADGE */
+.user-badge{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:6px 12px;font-size:13px}
+.user-avatar{width:24px;height:24px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#0B0D11}
+.loading-spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--accent2);border-radius:50%;animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:3rem;color:var(--muted)}
+.empty-state .empty-icon{font-size:3rem;margin-bottom:1rem}
+.empty-state p{font-size:14px}
+
+/* MY BOOKINGS */
+.my-bookings-card{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1rem;margin-bottom:10px;display:flex;align-items:center;gap:14px}
+.my-bookings-emoji{font-size:2rem;flex-shrink:0}
+.mbc-info{flex:1}
+.mbc-name{font-weight:600;font-size:14px;margin-bottom:3px}
+.mbc-dates{font-size:12px;color:var(--muted)}
+.mbc-amount{font-family:'Syne',sans-serif;font-weight:700;color:var(--accent);font-size:1.1rem;text-align:right}
+.mbc-amount sub{font-size:11px;color:var(--muted);font-weight:400;font-family:'DM Sans',sans-serif;display:block}
+
+footer{border-top:1px solid var(--border);padding:2rem;text-align:center;color:var(--muted);font-size:13px;margin-top:4rem}
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+@media(max-width:900px){
+  .hero{grid-template-columns:1fr;gap:2rem}
+  .features-grid,.cars-grid{grid-template-columns:repeat(2,1fr)}
+  .dash-grid{grid-template-columns:1fr}
+  .dash-sidebar{display:none}
+  .dash-stats{grid-template-columns:repeat(2,1fr)}
+  .admin-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .features-grid,.cars-grid{grid-template-columns:1fr}
+  .dash-stats{grid-template-columns:1fr 1fr}
+  .hero h1{font-size:2.2rem}
+  nav{padding:0.8rem 1rem}
+  .nav-links{gap:1rem}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo" onclick="show('home')">Rent<span>Ease</span></div>
+  <ul class="nav-links">
+    <li><a onclick="show('home')" class="active" id="nav-home">Home</a></li>
+    <li><a onclick="show('browse')" id="nav-browse">Browse Cars</a></li>
+    <li><a onclick="showPortal()" id="nav-vendor">My Portal</a></li>
+    <li id="nav-admin-li" style="display:none"><a onclick="show('admin')" id="nav-admin">Admin</a></li>
+  </ul>
+  <div class="nav-right" id="nav-right">
+    <button class="btn btn-ghost btn-sm" onclick="openAuth('login')">Sign In</button>
+    <button class="btn btn-primary btn-sm" onclick="openAuth('register')">Get Started</button>
+  </div>
+</nav>
+
+<!-- VIEWS -->
+
+<!-- HOME -->
+<div class="view active" id="view-home">
+  <div class="hero">
+    <div>
+      <div class="hero-badge">🚗 Car Rental Management Platform</div>
+      <h1>Drive Your <span>Business</span> Forward</h1>
+      <p>RentEase streamlines car rental operations — from real-time bookings to vendor management and analytics — all in one unified platform.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary btn-lg" onclick="show('browse')">Browse Vehicles</button>
+        <button class="btn btn-ghost btn-lg" onclick="showPortal()">My Portal →</button>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="stat-grid" id="hero-stats">
+        <div class="stat-card"><div class="label">Total Bookings</div><div class="value" id="hs-bookings">—</div><div class="sub">↑ real-time</div></div>
+        <div class="stat-card"><div class="label">Fleet Size</div><div class="value" id="hs-fleet">—</div><div class="sub">↑ growing</div></div>
+        <div class="stat-card"><div class="label">Revenue</div><div class="value" id="hs-revenue">—</div><div class="sub">↑ live data</div></div>
+        <div class="stat-card"><div class="label">Uptime</div><div class="value" id="hs-uptime">99.9%</div><div class="sub">All systems OK</div></div>
+      </div>
+      <div class="mini-booking" style="margin-top:12px">
+        <div class="mb-label">Quick Availability Check</div>
+        <div class="mini-row">
+          <input class="mini-input" type="text" placeholder="Pickup location" value="Ahmedabad"/>
+          <input class="mini-input" type="date" id="pickup-date"/>
+        </div>
+        <button class="btn btn-primary" style="width:100%;text-align:center" onclick="show('browse')">Search Available Cars →</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-header"><h2>Everything You Need</h2><p>A complete platform for customers, vendors, and administrators.</p></div>
+    <div class="features-grid">
+      <div class="feat-card"><div class="feat-icon yellow">🔐</div><h3>Secure Authentication</h3><p>JWT-based role authentication for customers, vendors, and admins with bcrypt-encrypted passwords.</p></div>
+      <div class="feat-card"><div class="feat-icon">🚙</div><h3>Vehicle Management</h3><p>Vendors can list vehicles with pricing and real-time availability updates persisted server-side.</p></div>
+      <div class="feat-card"><div class="feat-icon green">📅</div><h3>Smart Booking System</h3><p>Real-time availability validation on the server prevents double bookings automatically.</p></div>
+      <div class="feat-card"><div class="feat-icon yellow">💳</div><h3>Price Calculator</h3><p>Dynamic pricing with base rate × days + insurance + 5% platform fee, computed live.</p></div>
+      <div class="feat-card"><div class="feat-icon">📊</div><h3>Analytics Dashboard</h3><p>Actionable insights for vendors and admins — revenue trends, utilization, booking stats.</p></div>
+      <div class="feat-card"><div class="feat-icon green">🔔</div><h3>REST API Backend</h3><p>Full Express.js REST API with role-based access control and live data across all views.</p></div>
+    </div>
+  </div>
+
+  <div class="section" style="border-top:1px solid var(--border)">
+    <div class="section-header"><h2>Trusted by Vendors Across India</h2><p>Replacing manual processes with automated, conflict-free operations.</p></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px">
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem"><div style="font-size:1.8rem;font-weight:700;color:var(--accent);font-family:'Syne',sans-serif;margin-bottom:4px">0</div><div style="color:var(--text);font-weight:500;margin-bottom:4px">Double Bookings</div><div style="font-size:13px;color:var(--muted)">Guaranteed by server-side validation</div></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem"><div style="font-size:1.8rem;font-weight:700;color:var(--accent);font-family:'Syne',sans-serif;margin-bottom:4px">40%</div><div style="color:var(--text);font-weight:500;margin-bottom:4px">Faster Operations</div><div style="font-size:13px;color:var(--muted)">Compared to manual rental management</div></div>
+      <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:1.5rem"><div style="font-size:1.8rem;font-weight:700;color:var(--accent);font-family:'Syne',sans-serif;margin-bottom:4px">99.9%</div><div style="color:var(--text);font-weight:500;margin-bottom:4px">Platform Uptime</div><div style="font-size:13px;color:var(--muted)">Backed by automated backup systems</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- BROWSE CARS -->
+<div class="view" id="view-browse">
+  <div class="section">
+    <div class="section-header"><h2>Browse Available Vehicles</h2><p>Real-time availability from server — book instantly with no conflicts.</p></div>
+    <div class="filters">
+      <button class="filter-btn active" onclick="filterCars('all',this)">All Vehicles</button>
+      <button class="filter-btn" onclick="filterCars('sedan',this)">Sedan</button>
+      <button class="filter-btn" onclick="filterCars('suv',this)">SUV</button>
+      <button class="filter-btn" onclick="filterCars('hatchback',this)">Hatchback</button>
+      <button class="filter-btn" onclick="filterCars('luxury',this)">Luxury</button>
+    </div>
+    <div class="cars-grid" id="cars-grid"><div style="text-align:center;padding:3rem;color:var(--muted)"><div class="loading-spinner" style="margin:0 auto 1rem"></div>Loading vehicles...</div></div>
+  </div>
+</div>
+
+<!-- MY BOOKINGS -->
+<div class="view" id="view-mybookings">
+  <div class="section">
+    <div class="section-header"><h2>My Bookings</h2><p>All your rental history and active bookings.</p></div>
+    <div id="my-bookings-list"><div style="text-align:center;padding:3rem;color:var(--muted)"><div class="loading-spinner" style="margin:0 auto 1rem"></div></div></div>
+  </div>
+</div>
+
+<!-- VENDOR PORTAL -->
+<div class="view" id="view-vendor">
+  <div class="section" style="max-width:1200px">
+    <div class="section-header"><h2>Vendor Dashboard</h2><p>Manage your fleet, track bookings, and monitor revenue.</p></div>
+    <div class="dash-grid">
+      <div class="dash-sidebar">
+        <h3>Menu</h3>
+        <div class="side-item active" onclick="vendorTab('overview',this)">📊 Overview</div>
+        <div class="side-item" onclick="vendorTab('fleet',this)">🚙 My Fleet</div>
+        <div class="side-item" onclick="vendorTab('bookings',this)">📅 Bookings</div>
+        <div class="side-item" onclick="vendorTab('earnings',this)">💰 Earnings</div>
+        <div style="height:1px;background:var(--border);margin:1rem 0"></div>
+        <div class="side-item" onclick="showToast('⚙️','Settings','Account settings coming soon.')">⚙️ Settings</div>
+      </div>
+      <div class="dash-main" id="vendor-main"><div style="text-align:center;padding:3rem;color:var(--muted)"><div class="loading-spinner" style="margin:0 auto 1rem"></div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="view" id="view-admin">
+  <div class="section" style="max-width:1200px">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem">
+      <div><h2 style="font-size:2rem;font-weight:700;letter-spacing:-0.5px">Admin Control Panel</h2><p style="color:var(--muted);font-size:0.95rem;margin-top:4px">Platform-wide monitoring and management</p></div>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-ghost btn-sm" onclick="exportCSV()">Export CSV</button>
+        <button class="btn btn-primary btn-sm" onclick="loadAdminDashboard()">↻ Refresh</button>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:2rem" id="admin-stats">
+      <div class="ds-card"><div class="ds-label">Total Users</div><div class="ds-val" id="as-users" style="color:var(--accent2)">—</div></div>
+      <div class="ds-card"><div class="ds-label">Active Vendors</div><div class="ds-val" id="as-vendors" style="color:var(--success)">—</div></div>
+      <div class="ds-card"><div class="ds-label">Platform Revenue</div><div class="ds-val" id="as-revenue" style="color:var(--accent)">—</div></div>
+      <div class="ds-card"><div class="ds-label">Support Tickets</div><div class="ds-val" id="as-tickets" style="color:var(--danger)">7</div><div class="ds-change down">↑ 2 new</div></div>
+    </div>
+    <div class="admin-grid">
+      <div class="admin-card"><h3>Recent Activity <span style="font-size:12px;color:var(--muted);font-weight:400">Live</span></h3><div id="admin-activity"></div></div>
+      <div class="admin-card"><h3>Risk Monitor</h3>
+        <div style="font-size:13px">
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(42,47,69,0.5)"><span>Double booking attempt</span><span style="background:rgba(59,245,160,0.1);color:var(--success);padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">Blocked</span></div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(42,47,69,0.5)"><span>Payment gateway</span><span style="background:rgba(255,179,71,0.1);color:var(--warning);padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">Resolved</span></div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid rgba(42,47,69,0.5)"><span>Unverified vendor listing</span><span style="background:rgba(255,179,71,0.1);color:var(--warning);padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">Review</span></div>
+          <div style="display:flex;justify-content:space-between;padding:8px 0"><span>Data backup</span><span style="background:rgba(59,245,160,0.1);color:var(--success);padding:2px 8px;border-radius:4px;font-size:11px;font-weight:600">Healthy</span></div>
+        </div>
+      </div>
+      <div class="admin-card" style="grid-column:1/-1"><h3>Booking Volume — Last 7 Days <span class="tag tag-green" style="font-size:11px">Live</span></h3><div class="chart-bars" id="admin-chart"></div></div>
+    </div>
+    <div class="admin-card" style="margin-top:16px">
+      <h3 style="margin-bottom:1rem">All Vendors</h3>
+      <table class="bookings-table" style="width:100%">
+        <thead><tr><th>Vendor</th><th>City</th><th>Fleet</th><th>Revenue</th><th>Rating</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="admin-vendors-tbody"></tbody>
+      </table>
+    </div>
+    <div class="admin-card" style="margin-top:16px">
+      <h3 style="margin-bottom:1rem">All Bookings</h3>
+      <table class="bookings-table" style="width:100%">
+        <thead><tr><th>ID</th><th>Customer</th><th>Vehicle</th><th>Dates</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead>
+        <tbody id="admin-bookings-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay hidden" id="booking-modal">
+  <div class="modal">
+    <h2 id="modal-car-name">Book Vehicle</h2>
+    <div class="form-row">
+      <div class="form-group"><label>Pickup Date</label><input class="form-input" type="date" id="book-from" onchange="updatePricing()"/></div>
+      <div class="form-group"><label>Return Date</label><input class="form-input" type="date" id="book-to" onchange="updatePricing()"/></div>
+    </div>
+    <div class="form-group"><label>Pickup Location</label><input class="form-input" type="text" id="book-location" placeholder="Enter address or branch" value="Ahmedabad Central"/></div>
+    <div class="form-group"><label>Full Name</label><input class="form-input" type="text" id="book-name" placeholder="Your name"/></div>
+    <div class="form-group"><label>Phone Number</label><input class="form-input" type="tel" id="book-phone" placeholder="+91 98765 43210"/></div>
+    <div class="price-summary">
+      <div class="price-row"><span>Base rate</span><span id="ps-base">—</span></div>
+      <div class="price-row"><span>Duration</span><span id="ps-days">—</span></div>
+      <div class="price-row"><span>Insurance</span><span>₹200</span></div>
+      <div class="price-row"><span>Platform fee (5%)</span><span id="ps-fee">—</span></div>
+      <div class="price-row total"><span>Total</span><span id="ps-total">—</span></div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal()">Cancel</button>
+      <button class="btn btn-primary" id="confirm-booking-btn" onclick="confirmBooking()">Pay & Confirm →</button>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="modal-overlay hidden" id="auth-modal">
+  <div class="modal" style="max-width:420px">
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="login-tab" onclick="switchAuthTab('login')">Sign In</button>
+      <button class="auth-tab" id="register-tab" onclick="switchAuthTab('register')">Create Account</button>
+    </div>
+    <div class="auth-error" id="auth-error"></div>
+
+    <!-- Login Form -->
+    <div id="login-form">
+      <div class="form-group"><label>Email</label><input class="form-input" type="email" id="login-email" placeholder="you@example.com" value="vendor@rentease.in"/></div>
+      <div class="form-group"><label>Password</label><input class="form-input" type="password" id="login-password" placeholder="••••••••" value="vendor123"/></div>
+      <div style="font-size:12px;color:var(--muted);margin-bottom:1rem">
+        Demo: <span style="color:var(--accent2);cursor:pointer" onclick="fillDemo('admin')">Admin</span> · 
+        <span style="color:var(--accent2);cursor:pointer" onclick="fillDemo('vendor')">Vendor</span> · 
+        <span style="color:var(--accent2);cursor:pointer" onclick="fillDemo('customer')">Customer</span>
+      </div>
+      <button class="btn btn-primary" style="width:100%" id="login-btn" onclick="doLogin()">Sign In</button>
+    </div>
+
+    <!-- Register Form -->
+    <div id="register-form" style="display:none">
+      <div class="form-group"><label>Full Name</label><input class="form-input" type="text" id="reg-name" placeholder="Your name"/></div>
+      <div class="form-group"><label>Email</label><input class="form-input" type="email" id="reg-email" placeholder="you@example.com"/></div>
+      <div class="form-group"><label>Password</label><input class="form-input" type="password" id="reg-password" placeholder="Choose a strong password"/></div>
+      <div class="form-group">
+        <label>I am a</label>
+        <div class="role-select">
+          <div class="role-opt selected" onclick="selectRole('customer',this)"><span class="role-emoji">🙋</span>Customer</div>
+          <div class="role-opt" onclick="selectRole('vendor',this)"><span class="role-emoji">🏪</span>Vendor</div>
+        </div>
+      </div>
+      <div class="form-group" id="reg-city-group" style="display:none"><label>City</label><input class="form-input" type="text" id="reg-city" placeholder="Your city"/></div>
+      <button class="btn btn-primary" style="width:100%" id="register-btn" onclick="doRegister()">Create Account</button>
+    </div>
+
+    <div style="text-align:center;margin-top:1rem">
+      <button class="btn btn-ghost btn-sm" onclick="closeAuthModal()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- ADD VEHICLE MODAL -->
+<div class="modal-overlay hidden" id="add-vehicle-modal">
+  <div class="modal" style="max-width:420px">
+    <h2>Add Vehicle to Fleet</h2>
+    <div class="form-group"><label>Vehicle Name</label><input class="form-input" type="text" id="av-name" placeholder="e.g. Toyota Innova"/></div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Type</label>
+        <select class="form-input" id="av-type">
+          <option value="hatchback">Hatchback</option>
+          <option value="sedan">Sedan</option>
+          <option value="suv">SUV</option>
+          <option value="luxury">Luxury</option>
+        </select>
+      </div>
+      <div class="form-group"><label>Price per Day (₹)</label><input class="form-input" type="number" id="av-price" placeholder="1500"/></div>
+    </div>
+    <div class="form-row">
+      <div class="form-group">
+        <label>Fuel Type</label>
+        <select class="form-input" id="av-fuel">
+          <option>Petrol</option><option>Diesel</option><option>Electric</option><option>CNG</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Transmission</label>
+        <select class="form-input" id="av-trans">
+          <option>Manual</option><option>Automatic</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>Seats</label><input class="form-input" type="number" id="av-seats" value="5" min="2" max="12"/></div>
+      <div class="form-group">
+        <label>Emoji Icon</label>
+        <select class="form-input" id="av-emoji">
+          <option value="🚗">🚗 Hatchback</option>
+          <option value="🚘">🚘 Sedan</option>
+          <option value="🚙">🚙 SUV</option>
+          <option value="🏎️">🏎️ Luxury</option>
+          <option value="🚐">🚐 Van</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeAddVehicle()">Cancel</button>
+      <button class="btn btn-primary" onclick="submitAddVehicle()">Add Vehicle</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast hidden" id="toast">
+  <div class="toast-icon" id="toast-icon">✅</div>
+  <div class="toast-text"><h4 id="toast-title"></h4><p id="toast-msg"></p></div>
+</div>
+
+<footer>
+  <div style="font-family:'Syne',sans-serif;font-weight:700;font-size:1.1rem;color:var(--accent);margin-bottom:0.5rem">RentEase</div>
+  Car Rental Management Platform · Version 2.0 · Fully functional with REST API backend
+</footer>
+
+<script>
+// ──────────────────────────────────────────────
+//  CONFIG
+// ──────────────────────────────────────────────
+const API = window.location.origin; // same origin
+let token = localStorage.getItem('re_token');
+let currentUser = JSON.parse(localStorage.getItem('re_user') || 'null');
+let currentCar = null;
+let allVehicles = [];
+let vendorData = null;
+let selectedRole = 'customer';
+
+// ──────────────────────────────────────────────
+//  API HELPERS
+// ──────────────────────────────────────────────
+async function apiFetch(path, opts = {}) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  const res = await fetch(API + path, { headers, ...opts, body: opts.body ? JSON.stringify(opts.body) : undefined });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Request failed');
+  return data;
+}
+
+// ──────────────────────────────────────────────
+//  TOAST
+// ──────────────────────────────────────────────
+let toastTimer;
+function showToast(icon, title, msg) {
+  document.getElementById('toast-icon').textContent = icon;
+  document.getElementById('toast-title').textContent = title;
+  document.getElementById('toast-msg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.remove('hidden');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.add('hidden'), 3500);
+}
+
+// ──────────────────────────────────────────────
+//  AUTH
+// ──────────────────────────────────────────────
+function updateNavForUser() {
+  const navRight = document.getElementById('nav-right');
+  const adminLi = document.getElementById('nav-admin-li');
+  if (currentUser) {
+    const initial = currentUser.name.charAt(0).toUpperCase();
+    const roleColor = currentUser.role === 'admin' ? 'var(--danger)' : currentUser.role === 'vendor' ? 'var(--accent)' : 'var(--accent2)';
+    navRight.innerHTML = `
+      <div class="user-badge">
+        <div class="user-avatar" style="background:${roleColor}">${initial}</div>
+        <span>${currentUser.name.split(' ')[0]}</span>
+        <span class="tag tag-blue" style="font-size:11px">${currentUser.role}</span>
+      </div>
+      <button class="btn btn-ghost btn-sm" onclick="doLogout()">Logout</button>
+    `;
+    adminLi.style.display = currentUser.role === 'admin' ? '' : 'none';
+  } else {
+    navRight.innerHTML = `
+      <button class="btn btn-ghost btn-sm" onclick="openAuth('login')">Sign In</button>
+      <button class="btn btn-primary btn-sm" onclick="openAuth('register')">Get Started</button>
+    `;
+    adminLi.style.display = 'none';
+  }
+}
+
+function openAuth(tab) {
+  document.getElementById('auth-modal').classList.remove('hidden');
+  switchAuthTab(tab);
+}
+function closeAuthModal() { document.getElementById('auth-modal').classList.add('hidden'); }
+
+function switchAuthTab(tab) {
+  document.getElementById('login-form').style.display = tab === 'login' ? '' : 'none';
+  document.getElementById('register-form').style.display = tab === 'register' ? '' : 'none';
+  document.getElementById('login-tab').classList.toggle('active', tab === 'login');
+  document.getElementById('register-tab').classList.toggle('active', tab === 'register');
+  document.getElementById('auth-error').classList.remove('show');
+}
+
+function selectRole(role, el) {
+  selectedRole = role;
+  document.querySelectorAll('.role-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('reg-city-group').style.display = role === 'vendor' ? '' : 'none';
+}
+
+function fillDemo(role) {
+  const demos = { admin: ['admin@rentease.in','admin123'], vendor: ['vendor@rentease.in','vendor123'], customer: ['priya@example.com','user123'] };
+  document.getElementById('login-email').value = demos[role][0];
+  document.getElementById('login-password').value = demos[role][1];
+}
+
+async function doLogin() {
+  const btn = document.getElementById('login-btn');
+  btn.disabled = true; btn.textContent = 'Signing in...';
+  const errEl = document.getElementById('auth-error');
+  try {
+    const data = await apiFetch('/api/auth/login', { method: 'POST', body: { email: document.getElementById('login-email').value, password: document.getElementById('login-password').value } });
+    token = data.token; currentUser = data.user;
+    localStorage.setItem('re_token', token);
+    localStorage.setItem('re_user', JSON.stringify(currentUser));
+    closeAuthModal();
+    updateNavForUser();
+    showToast('👋', 'Welcome back!', `Signed in as ${currentUser.name} (${currentUser.role})`);
+  } catch (e) {
+    errEl.textContent = e.message; errEl.classList.add('show');
+  }
+  btn.disabled = false; btn.textContent = 'Sign In';
+}
+
+async function doRegister() {
+  const btn = document.getElementById('register-btn');
+  btn.disabled = true; btn.textContent = 'Creating account...';
+  const errEl = document.getElementById('auth-error');
+  try {
+    const data = await apiFetch('/api/auth/register', { method: 'POST', body: {
+      name: document.getElementById('reg-name').value,
+      email: document.getElementById('reg-email').value,
+      password: document.getElementById('reg-password').value,
+      role: selectedRole,
+      city: document.getElementById('reg-city').value,
+    }});
+    token = data.token; currentUser = data.user;
+    localStorage.setItem('re_token', token);
+    localStorage.setItem('re_user', JSON.stringify(currentUser));
+    closeAuthModal();
+    updateNavForUser();
+    showToast('🎉', 'Account created!', `Welcome to RentEase, ${currentUser.name}!`);
+  } catch (e) {
+    errEl.textContent = e.message; errEl.classList.add('show');
+  }
+  btn.disabled = false; btn.textContent = 'Create Account';
+}
+
+function doLogout() {
+  token = null; currentUser = null;
+  localStorage.removeItem('re_token'); localStorage.removeItem('re_user');
+  updateNavForUser();
+  show('home');
+  showToast('👋', 'Signed out', 'See you next time!');
+}
+
+// ──────────────────────────────────────────────
+//  NAV / VIEWS
+// ──────────────────────────────────────────────
+function show(page) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+  document.getElementById('view-' + page).classList.add('active');
+  const navEl = document.getElementById('nav-' + page);
+  if (navEl) navEl.classList.add('active');
+  if (page === 'browse') loadVehicles();
+  if (page === 'vendor') loadVendorDashboard();
+  if (page === 'admin') loadAdminDashboard();
+  if (page === 'mybookings') loadMyBookings();
+}
+
+function showPortal() {
+  if (!currentUser) { openAuth('login'); return; }
+  if (currentUser.role === 'admin') { show('admin'); return; }
+  if (currentUser.role === 'vendor') { show('vendor'); return; }
+  show('mybookings');
+}
+
+// ──────────────────────────────────────────────
+//  VEHICLES
+// ──────────────────────────────────────────────
+let currentFilter = 'all';
+
+async function loadVehicles() {
+  const grid = document.getElementById('cars-grid');
+  grid.innerHTML = '<div style="text-align:center;padding:3rem;color:var(--muted)"><div class="loading-spinner" style="margin:0 auto 1rem"></div>Loading vehicles...</div>';
+  try {
+    allVehicles = await apiFetch('/api/vehicles');
+    renderCars(currentFilter);
+  } catch (e) {
+    grid.innerHTML = `<div style="text-align:center;padding:3rem;color:var(--danger)">${e.message}</div>`;
+  }
+}
+
+function renderCars(filter) {
+  const grid = document.getElementById('cars-grid');
+  const filtered = filter === 'all' ? allVehicles : allVehicles.filter(c => c.type === filter);
+  if (!filtered.length) { grid.innerHTML = '<div class="empty-state"><div class="empty-icon">🚫</div><p>No vehicles in this category.</p></div>'; return; }
+  grid.innerHTML = filtered.map(c => `
+    <div class="car-card" onclick="openBooking(${c.id})">
+      <div class="car-img">${c.emoji}<div class="car-avail"><span class="tag ${c.available ? 'tag-green' : 'tag-red'}">${c.available ? 'Available' : 'Booked'}</span></div></div>
+      <div class="car-body">
+        <div class="car-name">${c.name}</div>
+        <div class="car-vendor">${c.vendorName}</div>
+        <div class="car-specs">
+          <div class="car-spec"><span>${c.seats}</span> seats</div>
+          <div class="car-spec"><span>${c.fuel}</span></div>
+          <div class="car-spec"><span>${c.transmission}</span></div>
+          <div class="car-spec">⭐ <span>${c.rating || 'New'}</span></div>
+        </div>
+        <div class="car-footer">
+          <div class="car-price">₹${c.price.toLocaleString('en-IN')}<sub>/day</sub></div>
+          <button class="btn btn-primary btn-sm" onclick="event.stopPropagation();openBooking(${c.id})" ${c.available ? '' : 'disabled style="opacity:0.4;cursor:not-allowed"'}>${c.available ? 'Book Now' : 'Unavailable'}</button>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filterCars(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCars(type);
+}
+
+// ──────────────────────────────────────────────
+//  BOOKING MODAL
+// ──────────────────────────────────────────────
+function openBooking(id) {
+  if (!currentUser) { showToast('🔐', 'Login required', 'Please sign in to book a vehicle.'); openAuth('login'); return; }
+  const car = allVehicles.find(c => c.id === id);
+  if (!car || !car.available) { showToast('🚫', 'Unavailable', 'This vehicle is already booked.'); return; }
+  currentCar = car;
+  document.getElementById('modal-car-name').textContent = 'Book — ' + car.name;
+  document.getElementById('book-name').value = currentUser.name;
+  const today = new Date(); const ret = new Date(); ret.setDate(today.getDate() + 3);
+  document.getElementById('book-from').value = today.toISOString().split('T')[0];
+  document.getElementById('book-to').value = ret.toISOString().split('T')[0];
+  updatePricing();
+  document.getElementById('booking-modal').classList.remove('hidden');
+}
+
+function updatePricing() {
+  if (!currentCar) return;
+  const from = new Date(document.getElementById('book-from').value);
+  const to = new Date(document.getElementById('book-to').value);
+  const days = Math.max(1, Math.round((to - from) / 86400000));
+  const base = currentCar.price * days;
+  const fee = Math.round(base * 0.05);
+  const total = base + fee + 200;
+  document.getElementById('ps-base').textContent = '₹' + currentCar.price.toLocaleString('en-IN') + '/day';
+  document.getElementById('ps-days').textContent = days + ' day' + (days > 1 ? 's' : '');
+  document.getElementById('ps-fee').textContent = '₹' + fee.toLocaleString('en-IN');
+  document.getElementById('ps-total').textContent = '₹' + total.toLocaleString('en-IN');
+}
+
+function closeModal() { document.getElementById('booking-modal').classList.add('hidden'); }
+
+async function confirmBooking() {
+  const btn = document.getElementById('confirm-booking-btn');
+  btn.disabled = true; btn.textContent = 'Processing...';
+  try {
+    await apiFetch('/api/bookings', { method: 'POST', body: {
+      vehicleId: currentCar.id,
+      from: document.getElementById('book-from').value,
+      to: document.getElementById('book-to').value,
+      location: document.getElementById('book-location').value,
+      customerName: document.getElementById('book-name').value,
+      phone: document.getElementById('book-phone').value,
+    }});
+    closeModal();
+    // mark as booked locally too
+    const v = allVehicles.find(v => v.id === currentCar.id);
+    if (v) v.available = false;
+    renderCars(currentFilter);
+    showToast('✅', 'Booking Confirmed!', 'Your reservation is confirmed. Check My Bookings for details.');
+  } catch (e) {
+    showToast('❌', 'Booking Failed', e.message);
+  }
+  btn.disabled = false; btn.textContent = 'Pay & Confirm →';
+}
+
+// ──────────────────────────────────────────────
+//  MY BOOKINGS
+// ──────────────────────────────────────────────
+async function loadMyBookings() {
+  const el = document.getElementById('my-bookings-list');
+  el.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--muted)"><div class="loading-spinner" style="margin:0 auto 1rem"></div></div>';
+  try {
+    const bookings = await apiFetch('/api/bookings');
+    if (!bookings.length) { el.innerHTML = '<div class="empty-state"><div class="empty-icon">📭</div><p>No bookings yet. <a style="color:var(--accent2);cursor:pointer" onclick="show(\'browse\')">Browse cars →</a></p></div>'; return; }
+    const sbMap = { Active: 'sb-active', Pending: 'sb-pending', Completed: 'sb-done', Cancelled: 'sb-cancelled' };
+    el.innerHTML = bookings.map(b => `
+      <div class="my-bookings-card">
+        <div class="my-bookings-emoji">${b.vehicleEmoji}</div>
+        <div class="mbc-info">
+          <div class="mbc-name">${b.vehicleName}</div>
+          <div class="mbc-dates">${b.from} → ${b.to} · ${b.location || ''}</div>
+          <div style="margin-top:6px"><span class="status-badge ${sbMap[b.status] || 'sb-pending'}">${b.status}</span></div>
+        </div>
+        <div class="mbc-amount">₹${b.amount.toLocaleString('en-IN')}<sub>total</sub></div>
+        ${b.status === 'Pending' || b.status === 'Active' ? `<button class="btn btn-danger btn-sm" onclick="cancelBooking(${b.id})">Cancel</button>` : ''}
+      </div>
+    `).join('');
+  } catch (e) {
+    el.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--danger)">${e.message}</div>`;
+  }
+}
+
+async function cancelBooking(id) {
+  if (!confirm('Cancel this booking?')) return;
+  try {
+    await apiFetch('/api/bookings/' + id, { method: 'DELETE' });
+    showToast('✅', 'Cancelled', 'Booking has been cancelled.');
+    loadMyBookings();
+    loadVehicles();
+  } catch (e) { showToast('❌', 'Error', e.message); }
+}
+
+// ──────────────────────────────────────────────
+//  VENDOR DASHBOARD
+// ──────────────────────────────────────────────
+let vendorTab_current = 'overview';
+
+async function loadVendorDashboard() {
+  if (!currentUser || currentUser.role === 'customer') { show('mybookings'); return; }
+  try {
+    vendorData = await apiFetch('/api/vendor/dashboard');
+    vendorTab(vendorTab_current);
+  } catch (e) {
+    document.getElementById('vendor-main').innerHTML = `<div style="color:var(--danger)">${e.message}</div>`;
+  }
+}
+
+function vendorTab(tab, el) {
+  vendorTab_current = tab;
+  document.querySelectorAll('.side-item').forEach(s => s.classList.remove('active'));
+  if (el) el.classList.add('active');
+  else { const items = document.querySelectorAll('.side-item'); if (items[['overview','fleet','bookings','earnings'].indexOf(tab)]) items[['overview','fleet','bookings','earnings'].indexOf(tab)].classList.add('active'); }
+  renderVendorMain(tab);
+}
+
+function renderVendorMain(tab) {
+  if (!vendorData) return;
+  const main = document.getElementById('vendor-main');
+  const d = vendorData;
+  const sbMap = { Active: 'sb-active', Pending: 'sb-pending', Completed: 'sb-done', Cancelled: 'sb-cancelled' };
+
+  if (tab === 'overview') {
+    main.innerHTML = `
+      <div class="dash-stats">
+        <div class="ds-card"><div class="ds-label">Total Vehicles</div><div class="ds-val" style="color:var(--accent2)">${d.totalVehicles}</div></div>
+        <div class="ds-card"><div class="ds-label">Active Rentals</div><div class="ds-val" style="color:var(--success)">${d.activeRentals}</div></div>
+        <div class="ds-card"><div class="ds-label">Total Revenue</div><div class="ds-val" style="color:var(--accent)">₹${(d.monthEarnings/1000).toFixed(0)}K</div></div>
+        <div class="ds-card"><div class="ds-label">Avg Rating</div><div class="ds-val">${d.avgRating}⭐</div></div>
+      </div>
+      <div style="font-size:13px;font-weight:600;margin-bottom:0.8rem">Recent Bookings</div>
+      ${d.recentBookings.length ? bookingsTable(d.recentBookings) : '<div class="empty-state"><p>No bookings yet.</p></div>'}
+    `;
+  } else if (tab === 'fleet') {
+    main.innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem">
+        <div style="font-size:15px;font-weight:600">My Fleet (${d.vehicles.length} vehicles)</div>
+        <button class="btn btn-primary btn-sm" onclick="openAddVehicle()">+ Add Vehicle</button>
+      </div>
+      ${d.vehicles.map(v => `
+        <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:0.9rem;display:flex;align-items:center;gap:12px;margin-bottom:8px">
+          <div style="font-size:2rem">${v.emoji}</div>
+          <div style="flex:1">
+            <div style="font-weight:600;font-size:14px">${v.name}</div>
+            <div style="font-size:12px;color:var(--muted)">${v.fuel} · ₹${v.price.toLocaleString('en-IN')}/day · ${v.transmission}</div>
+          </div>
+          <span class="tag ${v.available ? 'tag-green' : 'tag-red'}">${v.available ? 'Available' : 'Rented'}</span>
+          <button class="btn btn-ghost btn-sm" onclick="toggleAvailability(${v.id}, ${v.available})">
+            ${v.available ? 'Mark Rented' : 'Mark Available'}
+          </button>
+        </div>
+      `).join('') || '<div class="empty-state"><p>No vehicles yet. Add your first vehicle!</p></div>'}
+    `;
+  } else if (tab === 'bookings') {
+    const myBookings = vendorData.recentBookings;
+    main.innerHTML = `<div style="font-size:15px;font-weight:600;margin-bottom:1rem">All Bookings</div>${myBookings.length ? bookingsTable(myBookings) : '<div class="empty-state"><p>No bookings yet.</p></div>'}`;
+  } else if (tab === 'earnings') {
+    main.innerHTML = `
+      <div style="font-size:15px;font-weight:600;margin-bottom:1rem">Earnings Overview</div>
+      <div class="dash-stats" style="margin-bottom:1rem">
+        <div class="ds-card"><div class="ds-label">Total Earned</div><div class="ds-val" style="color:var(--accent)">₹${(d.monthEarnings/1000).toFixed(0)}K</div></div>
+        <div class="ds-card"><div class="ds-label">Active Rentals</div><div class="ds-val" style="color:var(--success)">${d.activeRentals}</div></div>
+        <div class="ds-card"><div class="ds-label">Fleet Size</div><div class="ds-val">${d.totalVehicles}</div></div>
+        <div class="ds-card"><div class="ds-label">Avg Rating</div><div class="ds-val">${d.avgRating}⭐</div></div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:1rem">
+        <div style="font-size:13px;font-weight:600;margin-bottom:0.5rem">Revenue Chart</div>
+        <div class="chart-bars" id="vendor-chart"></div>
+      </div>
+    `;
+    setTimeout(() => renderChart('vendor-chart', [28, 35, 31, 42, 39, 48], ['Nov','Dec','Jan','Feb','Mar','Apr']), 50);
+  }
+}
+
+function bookingsTable(bookings) {
+  const sbMap = { Active: 'sb-active', Pending: 'sb-pending', Completed: 'sb-done', Cancelled: 'sb-cancelled' };
+  return `<table class="bookings-table"><thead><tr><th>ID</th><th>Customer</th><th>Vehicle</th><th>Dates</th><th>Amount</th><th>Status</th><th>Action</th></tr></thead><tbody>
+    ${bookings.map(b => `<tr>
+      <td style="color:var(--accent2)">#${b.id}</td>
+      <td>${b.customerName}</td>
+      <td>${b.vehicleName || b.vehicleId}</td>
+      <td>${b.from} → ${b.to}</td>
+      <td style="font-weight:600">₹${b.amount.toLocaleString('en-IN')}</td>
+      <td><span class="status-badge ${sbMap[b.status] || 'sb-pending'}">${b.status}</span></td>
+      <td>
+        ${b.status === 'Pending' ? `<button class="btn btn-success btn-sm" onclick="updateBookingStatus(${b.id},'Active')">Activate</button>` : ''}
+        ${b.status === 'Active' ? `<button class="btn btn-ghost btn-sm" onclick="updateBookingStatus(${b.id},'Completed')">Complete</button>` : ''}
+      </td>
+    </tr>`).join('')}
+  </tbody></table>`;
+}
+
+async function updateBookingStatus(id, status) {
+  try {
+    await apiFetch('/api/bookings/' + id + '/status', { method: 'PUT', body: { status } });
+    showToast('✅', 'Updated', `Booking #${id} marked as ${status}.`);
+    loadVendorDashboard();
+  } catch (e) { showToast('❌', 'Error', e.message); }
+}
+
+async function toggleAvailability(vehicleId, currentlyAvailable) {
+  try {
+    await apiFetch('/api/vehicles/' + vehicleId, { method: 'PUT', body: { available: !currentlyAvailable } });
+    showToast('✅', 'Updated', 'Vehicle availability updated.');
+    loadVendorDashboard();
+  } catch (e) { showToast('❌', 'Error', e.message); }
+}
+
+function openAddVehicle() { document.getElementById('add-vehicle-modal').classList.remove('hidden'); }
+function closeAddVehicle() { document.getElementById('add-vehicle-modal').classList.add('hidden'); }
+
+async function submitAddVehicle() {
+  try {
+    await apiFetch('/api/vehicles', { method: 'POST', body: {
+      name: document.getElementById('av-name').value,
+      type: document.getElementById('av-type').value,
+      price: document.getElementById('av-price').value,
+      seats: document.getElementById('av-seats').value,
+      fuel: document.getElementById('av-fuel').value,
+      transmission: document.getElementById('av-trans').value,
+      emoji: document.getElementById('av-emoji').value,
+    }});
+    closeAddVehicle();
+    showToast('🚗', 'Vehicle Added!', 'Your vehicle is now listed on the platform.');
+    loadVendorDashboard();
+  } catch (e) { showToast('❌', 'Error', e.message); }
+}
+
+// ──────────────────────────────────────────────
+//  ADMIN DASHBOARD
+// ──────────────────────────────────────────────
+async function loadAdminDashboard() {
+  if (!currentUser || currentUser.role !== 'admin') { showToast('🔐', 'Admin only', 'This section requires admin access.'); return; }
+  try {
+    const [dash, vendors, bookings] = await Promise.all([
+      apiFetch('/api/admin/dashboard'),
+      apiFetch('/api/admin/vendors'),
+      apiFetch('/api/bookings'),
+    ]);
+    document.getElementById('as-users').textContent = dash.totalUsers;
+    document.getElementById('as-vendors').textContent = dash.activeVendors;
+    document.getElementById('as-revenue').textContent = '₹' + (dash.totalRevenue / 1000).toFixed(0) + 'K';
+
+    // Activity log
+    document.getElementById('admin-activity').innerHTML = dash.activityLog.map(a => `
+      <div class="activity-item">
+        <div class="activity-dot ${a.dot}"></div>
+        <div><div>${a.msg}</div><div class="activity-meta">${a.time}${a.amount ? ' · ' + a.amount : ''}</div></div>
+      </div>
+    `).join('');
+
+    // Vendors table
+    const sbMap = { Active: 'sb-active', Pending: 'sb-pending', Inactive: 'sb-done' };
+    document.getElementById('admin-vendors-tbody').innerHTML = vendors.map(v => `
+      <tr>
+        <td>${v.name}</td><td>${v.city}</td><td>${v.fleetSize}</td>
+        <td>₹${(v.revenue/1000).toFixed(0)}K</td><td>⭐ ${v.rating}</td>
+        <td><span class="status-badge ${sbMap[v.status] || 'sb-pending'}">${v.status}</span></td>
+        <td>
+          ${v.status === 'Pending' ? `<button class="btn btn-success btn-sm" onclick="approveVendor(${v.id})">Approve</button>` : `<button class="btn btn-ghost btn-sm" onclick="showToast('👁️','Vendor','Viewing ${v.name}...')">View</button>`}
+        </td>
+      </tr>
+    `).join('');
+
+    // Bookings table
+    const sbMap2 = { Active: 'sb-active', Pending: 'sb-pending', Completed: 'sb-done', Cancelled: 'sb-cancelled' };
+    document.getElementById('admin-bookings-tbody').innerHTML = bookings.map(b => `
+      <tr>
+        <td style="color:var(--accent2)">#${b.id}</td>
+        <td>${b.customerName}</td>
+        <td>${b.vehicleName || b.vehicleId}</td>
+        <td>${b.from} → ${b.to}</td>
+        <td style="font-weight:600">₹${b.amount.toLocaleString('en-IN')}</td>
+        <td><span class="status-badge ${sbMap2[b.status] || 'sb-pending'}">${b.status}</span></td>
+        <td>
+          ${b.status === 'Pending' ? `<button class="btn btn-success btn-sm" onclick="adminUpdateStatus(${b.id},'Active')">Activate</button>` : ''}
+          ${b.status !== 'Cancelled' && b.status !== 'Completed' ? `<button class="btn btn-danger btn-sm" style="margin-left:4px" onclick="adminUpdateStatus(${b.id},'Cancelled')">Cancel</button>` : ''}
+        </td>
+      </tr>
+    `).join('');
+
+    // Chart
+    setTimeout(() => renderChart('admin-chart', dash.weeklyBookings, ['Mon','Tue','Wed','Thu','Fri','Sat','Sun']), 100);
+  } catch (e) {
+    showToast('❌', 'Error', e.message);
+  }
+}
+
+async function approveVendor(id) {
+  try {
+    await apiFetch('/api/admin/vendors/' + id, { method: 'PUT', body: { status: 'Active' } });
+    showToast('✅', 'Vendor Approved', 'Vendor status updated to Active.');
+    loadAdminDashboard();
+  } catch (e) { showToast('❌', 'Error', e.message); }
+}
+
+async function adminUpdateStatus(id, status) {
+  try {
+    await apiFetch('/api/bookings/' + id + '/status', { method: 'PUT', body: { status } });
+    showToast('✅', 'Updated', `Booking #${id} → ${status}`);
+    loadAdminDashboard();
+  } catch (e) { showToast('❌', 'Error', e.message); }
+}
+
+function exportCSV() {
+  showToast('📤', 'Export', 'CSV report generation triggered. In production this would download a file.');
+}
+
+// ──────────────────────────────────────────────
+//  CHART
+// ──────────────────────────────────────────────
+function renderChart(id, vals, labels) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const max = Math.max(...vals);
+  el.innerHTML = vals.map((v, i) => `
+    <div class="bar-col">
+      <div class="bar" style="height:${Math.round(v / max * 88)}px;background:${i === vals.length - 1 ? 'var(--accent)' : 'var(--accent2)'}"></div>
+      <div class="bar-label">${labels ? labels[i] : i}</div>
+    </div>
+  `).join('');
+}
+
+// ──────────────────────────────────────────────
+//  HERO STATS (live from API)
+// ──────────────────────────────────────────────
+async function loadHeroStats() {
+  try {
+    const s = await apiFetch('/api/stats');
+    document.getElementById('hs-bookings').textContent = s.totalBookings.toLocaleString('en-IN');
+    document.getElementById('hs-fleet').textContent = s.fleetSize;
+    document.getElementById('hs-revenue').textContent = '₹' + (s.revenue / 100000).toFixed(1) + 'L';
+  } catch {}
+}
+
+// ──────────────────────────────────────────────
+//  INIT
+// ──────────────────────────────────────────────
+document.getElementById('pickup-date').value = new Date().toISOString().split('T')[0];
+updateNavForUser();
+loadHeroStats();
+
+// Enter key on auth fields
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (!document.getElementById('auth-modal').classList.contains('hidden')) {
+      if (document.getElementById('login-form').style.display !== 'none') doLogin();
+      else doRegister();
+    }
+  }
+});
+</script>
+</body>
+</html>
